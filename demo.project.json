@@ -1,0 +1,29 @@
+{
+    "name": "LocalTweenPlate",
+    "tree": {
+        "$className": "DataModel",
+        "Workspace": {
+            "$className": "Workspace",
+            "TestModels": {
+                "$path": "./demo/Workspace/TestModels.rbxmx"
+            }
+        },
+        "ReplicatedStorage": {
+            "$className": "ReplicatedStorage",
+            "LocalTween": {
+                "$path": "."
+            }
+        },
+        "ServerScriptService": {
+            "$className": "ServerScriptService",
+            "$path": "./demo/ServerScriptService"
+        },
+        "StarterPlayer": {
+            "$className": "StarterPlayer",
+            "StarterPlayerScripts": {
+                "$className": "StarterPlayerScripts",
+                "$path": "./demo/StarterPlayerScripts"
+            }
+        }
+    }
+}
