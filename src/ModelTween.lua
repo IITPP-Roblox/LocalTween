@@ -3,6 +3,7 @@ TheNexusAvenger
 
 Helper for tweening models.
 --]]
+--!strict
 
 local RunService = game:GetService("RunService")
 local TweenService = game:GetService("TweenService")
@@ -15,7 +16,7 @@ local CurrentTweeningModelTimes = {}
 --[[
 Tweens a model to a target CFrame.
 --]]
-return function(Model: Model, Info: TweenInfo, Target: CFrame)
+return function(Model: Model, Info: TweenInfo, Target: CFrame): ()
     --Store the current time.
     local StartTime = tick()
     CurrentTweeningModelTimes[Model] = StartTime

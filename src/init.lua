@@ -3,6 +3,7 @@ TheNexusAvenger
 
 Plays tweens on the client.
 --]]
+--!strict
 
 local RunService = game:GetService("RunService")
 local TweenService = game:GetService("TweenService")
@@ -27,30 +28,31 @@ end
 --[[
 Plays a tween.
 --]]
-function LocalTween:Play(Target: Instance, Info: TweenInfo | number, Properties: table): nil
+function LocalTween:Play(Target: Instance, Info: TweenInfo | number, Properties: {[string]: any}): ()
     --Convert the tween info if it is just a number.
     if typeof(Info) == "number" then
         Info = TweenInfo.new(Info)
     end
+    local Tween = Info :: TweenInfo
 
     if RunService:IsServer() then
         --Warn if there are unsupported properties.
-        if Info.RepeatCount ~= 0 then
+        if Tween.RepeatCount ~= 0 then
             warn("TweenInfo.RepeatCount is not supported by LocalTween.")
         end
-        if Info.Reverses ~= false then
+        if Tween.Reverses ~= false then
             warn("TweenInfo.Reverses is not supported by LocalTween.")
         end
-        if Info.DelayTime ~= 0 then
+        if Tween.DelayTime ~= 0 then
             warn("TweenInfo.DelayTime is not supported by LocalTween.")
         end
 
         --Message the clients to start the tween.
         StartTweenEvent:FireAllClients(Target, {
-            Info.Time,
-            Info.EasingStyle,
-            Info.EasingDirection,
-        }, Properties)
+            Tween.Time,
+            Tween.EasingStyle,
+            Tween.EasingDirection,
+        } :: {any}, Properties)
 
         --Store the properties being tweened.
         local CurrentTime = tick()
@@ -63,14 +65,14 @@ function LocalTween:Play(Target: Instance, Info: TweenInfo | number, Properties:
         end
 
         --Wait for the tween to finish.
-        task.delay(Info.Time, function()
+        task.delay(Tween.Time, function()
             --Set the properties.
             for Name, Value in pairs(Properties) do
                 if TweenPropertyTimes[Name] == CurrentTime then
                     if Name == "CFrame" and Target:IsA("Model") then
                         Target:PivotTo(Value)
                     else
-                        Target[Name] = Value
+                        (Target :: any)[Name] = Value --TODO: Table indexing for instances results in typing errors - https://github.com/Roblox/luau/issues/586
                     end
                     TweenPropertyTimes[Name] = nil
                 end
@@ -83,14 +85,14 @@ function LocalTween:Play(Target: Instance, Info: TweenInfo | number, Properties:
         --Start the model tween.
         if Target:IsA("Model") and Properties.CFrame then
             task.spawn(function()
-                ModelTween(Target, Info, Properties.CFrame)
+                ModelTween(Target, Tween, Properties.CFrame)
             end)
             Properties.CFrame = nil
         end
 
         --Start the tween.
         if next(Properties) ~= nil then
-            TweenService:Create(Target, Info, Properties):Play()
+            TweenService:Create(Target, Tween, Properties):Play()
         end
     end
 end
@@ -98,7 +100,7 @@ end
 --[[
 Wrapper for moving a model to a CFrame or part.
 --]]
-function LocalTween:TweenModel(Model: Model, Info: TweenInfo | number, Target: CFrame | BasePart): nil
+function LocalTween:TweenModel(Model: Model, Info: TweenInfo | number, Target: CFrame | BasePart): ()
     if typeof(Target) == "Instance" then
         Target = Target.CFrame
     end
@@ -110,7 +112,7 @@ end
 --[[
 Wrapper for tweening the speed of a Motor6D.
 --]]
-function LocalTween:TweenMotorSpeed(Motor6D: Motor6D, Speed: number, Info: TweenInfo | number): nil
+function LocalTween:TweenMotorSpeed(Motor6D: Motor6D, Speed: number, Info: TweenInfo | number): ()
     self:Play(Motor6D, Info, {
         MaxVelocity = Speed,
     })
@@ -119,9 +121,9 @@ end
 --[[
 Sets up the LocalTween module on the client.
 --]]
-function LocalTween:SetUp(): nil
+function LocalTween:SetUp(): ()
 	StartTweenEvent = script:WaitForChild("StartTween")
-    StartTweenEvent.OnClientEvent:Connect(function(Target: Instance, Info: table, Properties: table)
+    StartTweenEvent.OnClientEvent:Connect(function(Target: Instance?, Info: {any}, Properties: {[string]: any})
         if Target == nil then return end
         self:Play(Target, TweenInfo.new(unpack(Info)), Properties)
     end)
