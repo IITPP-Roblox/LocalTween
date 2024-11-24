@@ -1,8 +1,5 @@
---[[
-TheNexusAvenger
-
-Runs the LocalTween demos on the server.
---]]
+--Runs the LocalTween demos on the server.
+--!strict
 
 local Workspace = game:GetService("Workspace")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
