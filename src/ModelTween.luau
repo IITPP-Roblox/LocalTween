@@ -1,8 +1,4 @@
---[[
-TheNexusAvenger
-
-Helper for tweening models.
---]]
+--Helper for tweening models.
 --!strict
 
 local RunService = game:GetService("RunService")
@@ -30,7 +26,7 @@ return function(Model: Model, Info: TweenInfo, Target: CFrame): ()
 
     --Update the pivot.
     local Bound = true
-    local ModelTweenId = "ModelTween"..HttpService:GenerateGUID()
+    local ModelTweenId = `ModelTween{HttpService:GenerateGUID()}`
     RunService:BindToRenderStep(ModelTweenId, 1, function()
         if CurrentTweeningModelTimes[Model] ~= StartTime then
             if Bound then
